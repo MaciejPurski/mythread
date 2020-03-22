@@ -6,11 +6,17 @@
 
 int mythread_mutex(mutex_t *mutex)
 {
+    mutex = (mutex_t *)malloc(sizeof(mutex_t));
+
+    if (!mutex) {
+        perror("ERROR: Can't create mutex, no memory!\n");
+        return -1;
+    }
+
     mutex->taken = false;
     mutex->n_waiting = 0;
     mutex->wait_queue = NULL;
 
-    // TODO: return something more interesting
     return 0;
 }
 

@@ -1,11 +1,19 @@
 #include <stdio.h>
-#include "mutex.h"
-#include "thread.h"
+#include "cond.h"
 
 int mythread_cond(cond_t *cond)
 {
+    cond = (cond_t *)malloc(sizeof(cond_t));
+
+    if (!cond) {
+        perror("ERROR: Can't create cond variable, no memory!\n");
+        return -1;
+    }
+
     cond->mutex = NULL;
     cond->thread_waiting = NULL;
+
+    return 0;
 }
 
 int mythread_wait(cond_t *cond, mutex_t *mutex)

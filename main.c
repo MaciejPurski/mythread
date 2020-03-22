@@ -1,4 +1,4 @@
-#include "include/mythread/mythread.h"
+#include <mythread/mythread.h>
 #include <stdio.h>
 
 #define ARR_SIZE(x) sizeof(x) / sizeof(x[0])
@@ -10,20 +10,20 @@ typedef struct {
     int n_iterations;
 } thread_args;
 
-struct mutex_t mutex;
+mutex_t *mutex;
 
 void thread_fun(void *args) {
     thread_args *t_args = (thread_args *)args;
     printf("Thread %s started\n", t_args->name);
 
-    mythread_lock(&mutex);
+    mythread_lock(mutex);
 
     for (int i = 0; i < t_args->n_iterations; i++) {
         printf("Running: %s priority: %d \n", t_args->name, t_args->priority);
         for (int j = 0; j < BURN_ITERATIONS; j++) {}
     }
 
-    mythread_unlock(&mutex);
+    mythread_unlock(mutex);
 
     printf("Thread %s exiting\n", t_args->name);
     mythread_exit();
@@ -64,7 +64,7 @@ void thread3() {
 
 int main()
 {
-    mythread_mutex(&mutex);
+    mythread_mutex(mutex);
     thread_args threads[] = { {"a", 5, 10},
                          {"b", 5, 10},
                          {"c", 0, 10},

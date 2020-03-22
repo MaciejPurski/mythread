@@ -1,7 +1,8 @@
 #ifndef C_THREADS_MYTHREAD_H
 #define C_THREADS_MYTHREAD_H
 
-#include "types.h"
+typedef struct mutex_struct mutex_t;
+typedef struct cond_struct cond_t;
 
 int mythread_start(void (*thread)(void *), void *args, unsigned int priority);
 
