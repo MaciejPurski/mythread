@@ -1,9 +1,7 @@
 #ifndef C_THREADS_MYTHREAD_H
 #define C_THREADS_MYTHREAD_H
 
-#include "cond.h"
-#include "mutex.h"
-
+#include "types.h"
 
 int mythread_start(void (*thread)(void *), void *args, unsigned int priority);
 
@@ -25,4 +23,4 @@ int mythread_signal(cond_t *cond);
 
 int mythread_destroy(void *o);
 
-#endif //C_THREADS_MYTHREAD_H
+#endif //C_THREADS_THREAD_H

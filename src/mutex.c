@@ -1,6 +1,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include "mutex.h"
+#include "thread.h"
 
 
 int mythread_mutex(mutex_t *mutex)

@@ -147,7 +147,7 @@ thread_t *thread_struct_init(void (*thread)(void *), void *args, unsigned int pr
     new_thread->ctx.uc_stack.ss_size = sizeof(new_thread->stack);
     new_thread->state = THREAD_READY;
 
-    makecontext(&new_thread->ctx, thread, 1, args);
+    makecontext(&new_thread->ctx, (void (*)(void))thread, 1, args);
     n_threads++;
 
     return new_thread;

@@ -3,7 +3,23 @@ project(c_threads C)
 
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Werror")
 
-add_executable(c_threads main.c mythread.h mythread.c thread.h mutex.c mutex.h cond.h cond.c)
 
-add_executable(cond-test conditional-test.c mythread.h mythread.c thread.h mutex.c mutex.h cond.h cond.c)
+# Build a library
+FILE(GLOB mythreadsrc ./src/*)
+ADD_LIBRARY(mythreadlib STATIC ${mythreadsrc} include/mythread/types.h)
+TARGET_INCLUDE_DIRECTORIES(mythreadlib PRIVATE ./src/ ./include/)
+
+
+INCLUDE_DIRECTORIES(./include/)
+
+ADD_EXECUTABLE(threads-test main.c)
+TARGET_LINK_LIBRARIES(threads-test mythreadlib)
+
+ADD_EXECUTABLE(cond-test conditional-test.c)
+TARGET_LINK_LIBRARIES(threads-test mythreadlib)
+
+#add_executable(c_threads main.c include/mythread/mythread.h src/mythread.c src/thread.h src/mutex.c src/mutex.h src/cond.h src/cond.c)
+#
+#add_executable(cond-test conditional-test.c include/mythread/mythread.h src/mythread.c src/thread.h src/mutex.c src/mutex.h src/cond.h src/cond.c)

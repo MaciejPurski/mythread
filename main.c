@@ -1,12 +1,5 @@
-#include "mythread.h"
+#include "include/mythread/mythread.h"
 #include <stdio.h>
-#include <stdlib.h>
-
-#include <unistd.h>
-#include <signal.h>
-#include <sys/signal.h>
-#include <ucontext.h>
-#include <stdbool.h>
 
 #define ARR_SIZE(x) sizeof(x) / sizeof(x[0])
 #define BURN_ITERATIONS 100000000

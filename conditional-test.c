@@ -1,4 +1,4 @@
-#include "mythread.h"
+#include "include/mythread/mythread.h"
 #include <stdio.h>
 
 #define TCOUNT 10

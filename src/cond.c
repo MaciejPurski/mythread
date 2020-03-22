@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include "cond.h"
+#include "mutex.h"
+#include "thread.h"
 
 int mythread_cond(cond_t *cond)
 {
