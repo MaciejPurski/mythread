@@ -4,6 +4,11 @@
 
 int mythread_cond(cond_t *cond)
 {
+    if (!cond) {
+        perror("ERROR: cond is NULL!");
+        return -1;
+    }
+
     cond_internal *_cond = (cond_internal *) malloc(sizeof(cond_internal));
 
     if (!_cond) {
@@ -21,7 +26,21 @@ int mythread_cond(cond_t *cond)
 
 int mythread_wait(cond_t *cond, mutex_t *mutex)
 {
-    CRIT_SECTION_BEGIN();
+    if (!mutex || !cond) {
+        perror("ERROR: cond and mutex must not be NULL!\n");
+        return -1;
+    }
+
+    if (!mutex->private) {
+        perror("ERROR: Mutex is not initialized!\n");
+        return -1;
+    }
+
+    if (!cond->private) {
+        perror("ERROR: Cond is not initialized!\n");
+        return -1;
+    }
+
     cond_internal *_cond = (cond_internal *) cond->private;
     mutex_internal *_mutex = (mutex_internal *) mutex->private;
 
@@ -37,24 +56,30 @@ int mythread_wait(cond_t *cond, mutex_t *mutex)
         return -1;
     }
 
+    CRIT_SECTION_BEGIN();
     _mutex_unlock(mutex);
     _cond->thread_waiting = get_current_thread();
     thread_wait(_cond->thread_waiting);
 
     _mutex_lock(mutex);
     CRIT_SECTION_END();
+
+    return 0;
 }
 
 int mythread_signal(cond_t *cond)
 {
-    CRIT_SECTION_BEGIN();
-    cond_internal *_cond = (cond_internal *) cond->private;
-
-    // TODO: maybe unnessecary?
-    if (_cond->mutex && !_cond->mutex->taken) {
-        perror("Mutex in cond variable must be taken!\n");
+    if (!cond) {
+        perror("ERROR: cond must not be NULL!\n");
         return -1;
     }
+
+    if (!cond->private) {
+        perror("ERROR: cond must be initialized!\n");
+        return -1;
+    }
+    CRIT_SECTION_BEGIN();
+    cond_internal *_cond = (cond_internal *) cond->private;
 
     if (_cond->thread_waiting) {
         thread_wakeup(_cond->thread_waiting);
@@ -62,4 +87,6 @@ int mythread_signal(cond_t *cond)
     }
 
     CRIT_SECTION_END();
+
+    return 0;
 }

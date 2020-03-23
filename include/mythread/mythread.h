@@ -1,7 +1,7 @@
 #ifndef C_THREADS_MYTHREAD_H
 #define C_THREADS_MYTHREAD_H
 
-/*
+/**
  * Structs representing mutex and conditional variable. All actual
  * struct members are hidden from a user of the library in
  * order to prevent them from manipulting them manually. Internal
@@ -69,12 +69,41 @@ int mythread_lock(mutex_t *mutex);
  */
 int mythread_unlock(mutex_t *mutex);
 
+/**
+ * This function initializes a cond_t struct.
+ * @param cond Pointer to cond_t struct
+ * @return 0 on success, -1 on failure
+ */
 int mythread_cond(cond_t *cond);
 
+/**
+ * mythread_wait() causes a running thread to wait on a given
+ * conditional variable. It must be called under a locked mutex.
+ * It atomically (under signals blocked) releases a mutex, and causes
+ * an running thread to be suspended. Once the other thread, calls
+ * mythread_signal() on the same variable, a mutex is acquired once
+ * again and execution proceeds.
+ * @param cond Pointer to conditional variable. Must be initialized.
+ * @param mutex Pointer to mutex. Must be initialized and locked.
+ * @return 0 on success, -1 on failure
+ */
 int mythread_wait(cond_t *cond, mutex_t *mutex);
 
-int mythread_signal(cond_t *_cond);
+/**
+ * mythread_signal() wakes up a thread waiting on a given conditional
+ * variable.
+ * @param cond Pointer to conditional variable. It must be initialized.
+ * @return 0 on success, -1 on failure
+ */
+int mythread_signal(cond_t *cond);
 
+/**
+ * mythread_destroy() releases memory allocated for either mutex or
+ *                    conditional variable. Calling it under a locked
+ *                    mutex or used conditional variable is undefined.
+ * @param cond Pointer to either mutex_t or cond_t.
+ * @return 0 on success, -1 on failure
+ */
 int mythread_destroy(void *o);
 
 #endif
