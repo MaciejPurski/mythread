@@ -6,11 +6,11 @@
 #include "thread.h"
 
 
-struct mutex_struct {
+typedef struct _mutex_internal {
     bool taken;
     thread_t *wait_queue;
     unsigned int n_waiting;
-};
+} mutex_internal;
 
 int __mythread_mutex_unlock(mutex_t *mutex);
 

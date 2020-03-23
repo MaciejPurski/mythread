@@ -1,37 +1,40 @@
 #include <signal.h>
 #include <stdio.h>
 #include "mutex.h"
-#include "thread.h"
 
 
 int mythread_mutex(mutex_t *mutex)
 {
-    mutex = (mutex_t *)malloc(sizeof(mutex_t));
+    mutex_internal *_mutex = (mutex_internal *) malloc(sizeof(mutex_internal));
 
-    if (!mutex) {
+    if (!_mutex) {
         perror("ERROR: Can't create mutex, no memory!\n");
         return -1;
     }
 
-    mutex->taken = false;
-    mutex->n_waiting = 0;
-    mutex->wait_queue = NULL;
+    _mutex->taken = false;
+    _mutex->n_waiting = 0;
+    _mutex->wait_queue = NULL;
+
+    mutex->private = (void *) _mutex;
 
     return 0;
 }
 
 int __mythread_mutex_lock(mutex_t *mutex)
 {
-    if (mutex->taken) {
+    mutex_internal *_mutex = (mutex_internal *) mutex->private;
+
+    if (_mutex->taken) {
         thread_t *current = get_current_thread();
 
         printf("Block current thread\n");
-        mutex->n_waiting++;
+        _mutex->n_waiting++;
 
-        if (!mutex->wait_queue) {
-            mutex->wait_queue = current;
+        if (!_mutex->wait_queue) {
+            _mutex->wait_queue = current;
         } else {
-            thread_t *tmp = mutex->wait_queue;
+            thread_t *tmp = _mutex->wait_queue;
             while (tmp->next)
                 tmp = tmp->next;
 
@@ -40,7 +43,7 @@ int __mythread_mutex_lock(mutex_t *mutex)
 
         thread_wait(current);
     } else {
-        mutex->taken = true;
+        _mutex->taken = true;
     }
 }
 
@@ -53,13 +56,15 @@ int mythread_lock(mutex_t *mutex)
 
 int __mythread_mutex_unlock(mutex_t *mutex)
 {
-    mutex->taken = false;
+    mutex_internal *_mutex = (mutex_internal *) mutex->private;
 
-    if (mutex->wait_queue) {
-        thread_t *next = mutex->wait_queue->next;
+    _mutex->taken = false;
+
+    if (_mutex->wait_queue) {
+        thread_t *next = _mutex->wait_queue->next;
         // TODO: better wakeup all the threads waiting on the mutex
-        thread_wakeup(mutex->wait_queue);
-        mutex->wait_queue = next;
+        thread_wakeup(_mutex->wait_queue);
+        _mutex->wait_queue = next;
     }
 }
 

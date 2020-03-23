@@ -230,5 +230,17 @@ void thread_wakeup(thread_t *thread)
     thread_add(thread);
 }
 
+struct mythread_object {
+    void *private;
+};
+
+int mythread_destroy(void *o)
+{
+    struct mythread_object *_o = (struct mythread_object *) o;
+    free(_o->private);
+
+    return 0;
+}
+
 
 
