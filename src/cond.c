@@ -37,11 +37,11 @@ int mythread_wait(cond_t *cond, mutex_t *mutex)
         return -1;
     }
 
-    __mythread_mutex_unlock(mutex);
+    _mutex_unlock(mutex);
     _cond->thread_waiting = get_current_thread();
     thread_wait(_cond->thread_waiting);
 
-    __mythread_mutex_lock(mutex);
+    _mutex_lock(mutex);
     CRIT_SECTION_END();
 }
 

@@ -40,7 +40,7 @@ int main()
     for (int i = 0; i < ARR_SIZE(threads); i++)
         mythread_start(thread_fun, (void *) &threads[i], threads[i].priority);
 
-    threads_join();
+    mythread_join();
 
     printf("Threads exited\n");
 

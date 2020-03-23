@@ -12,8 +12,12 @@ typedef struct _mutex_internal {
     unsigned int n_waiting;
 } mutex_internal;
 
-int __mythread_mutex_unlock(mutex_t *mutex);
 
-int __mythread_mutex_lock(mutex_t *mutex);
+/*
+ * Internal functions used to unlock and lock a mutex.
+ * They must be called under SIGALRM blocked.
+ */
+void _mutex_unlock(mutex_t *mutex);
+void _mutex_lock(mutex_t *mutex);
 
 #endif

@@ -5,6 +5,10 @@
 
 int mythread_mutex(mutex_t *mutex)
 {
+    if (!mutex) {
+        perror("ERROR: mutex is NULL!\n");
+        return -1;
+    }
     mutex_internal *_mutex = (mutex_internal *) malloc(sizeof(mutex_internal));
 
     if (!_mutex) {
@@ -21,7 +25,7 @@ int mythread_mutex(mutex_t *mutex)
     return 0;
 }
 
-int __mythread_mutex_lock(mutex_t *mutex)
+void _mutex_lock(mutex_t *mutex)
 {
     mutex_internal *_mutex = (mutex_internal *) mutex->private;
 
@@ -31,6 +35,8 @@ int __mythread_mutex_lock(mutex_t *mutex)
         printf("Block current thread\n");
         _mutex->n_waiting++;
 
+        /* Put the current thread on the end of the
+         * waiting queue */
         if (!_mutex->wait_queue) {
             _mutex->wait_queue = current;
         } else {
@@ -49,12 +55,24 @@ int __mythread_mutex_lock(mutex_t *mutex)
 
 int mythread_lock(mutex_t *mutex)
 {
+    if (!mutex) {
+        perror("ERROR: mutex is NULL!\n");
+        return -1;
+    }
+
+    if (!mutex->private) {
+        perror("ERROR: Trying to lock an uninitialized mutex!\n");
+        return -1;
+    }
+
     CRIT_SECTION_BEGIN();
-    __mythread_mutex_lock(mutex);
+    _mutex_lock(mutex);
     CRIT_SECTION_END();
+
+    return 0;
 }
 
-int __mythread_mutex_unlock(mutex_t *mutex)
+void _mutex_unlock(mutex_t *mutex)
 {
     mutex_internal *_mutex = (mutex_internal *) mutex->private;
 
@@ -70,7 +88,19 @@ int __mythread_mutex_unlock(mutex_t *mutex)
 
 int mythread_unlock(mutex_t *mutex)
 {
+    if (!mutex) {
+        perror("ERROR: mutex is NULL!\n");
+        return -1;
+    }
+
+    if (!mutex->private) {
+        perror("ERROR: Trying to lock an uninitialized mutex!\n");
+        return -1;
+    }
+
     CRIT_SECTION_BEGIN();
-    __mythread_mutex_unlock(mutex);
+    _mutex_unlock(mutex);
     CRIT_SECTION_END();
+
+    return 0;
 }

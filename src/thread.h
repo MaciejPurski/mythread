@@ -7,8 +7,8 @@
 #define STACK_SIZE 8192
 #define MAX_THREADS 64
 #define THREADS_LIMIT_EXC 255 /* Special code informing that threads limit has been exceeded */
-#define MAX_PRIORITY 100
-#define DEFAULT_PRIORITY 50
+#define MAX_PRIORITY 10
+#define SCHEDULE_INTERVAL 1 /* Value in seconds passed to alarm() function */
 
 typedef enum {
     THREAD_RUNNING,
@@ -38,4 +38,4 @@ void thread_wait(thread_t *thread);
 void thread_wakeup(thread_t *thread);
 thread_t *get_current_thread();
 
-#endif //C_THREADS_THREAD_H
+#endif

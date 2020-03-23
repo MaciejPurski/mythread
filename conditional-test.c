@@ -48,8 +48,7 @@ int main()
     mythread_start(inc_count, NULL, 10);
 
 
-
-    threads_join();
+    mythread_join();
 
     printf("Threads exited\n");
 }
