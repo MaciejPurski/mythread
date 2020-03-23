@@ -14,8 +14,6 @@ static thread_t *sched_thread = NULL;
 
 static ucontext_t main_ctx;
 
-bool preempted = false;
-
 // TODO: check errors everywhere
 void threads_join()
 {
@@ -30,7 +28,7 @@ void next_thread()
     /* Reschedule the alarm, giving the new thread a full time slice */
     // TODO: maybe not reschedule?
     alarm(1);
-    swapcontext(&sched_thread->ctx, &current->ctx);
+    setcontext(&current->ctx);
 }
 
 void thread_destroy()
@@ -43,13 +41,15 @@ void thread_destroy()
 
     if (current) {
         next_thread();
+    } else {
+        setcontext(&sched_thread->ctx);
     }
 }
 
 void mythread_exit()
 {
     CRIT_SECTION_BEGIN();
-    swapcontext(&current->ctx, &sched_thread->ctx);
+    thread_destroy();
     CRIT_SECTION_END();
 }
 
@@ -70,21 +70,18 @@ void schedule()
         tmp->next = old;
     }
 
-    preempted = false;
-    next_thread();
+    current->state = THREAD_RUNNING;
+    /* Reschedule the alarm, giving the new thread a full time slice */
+    // TODO: maybe not reschedule?
+    alarm(1);
+    swapcontext(&sched_thread->ctx, &current->ctx);
 }
 
 /* TODO: make functions static */
 void run_scheduler()
 {
     while (current) {
-        /* If the scheduler was called without preemption
-         * by a returning thread */
-        if (!preempted) {
-            thread_destroy();
-        } else {
-            schedule();
-        }
+        schedule();
     }
 
     /* If there are no more threads,
@@ -96,7 +93,6 @@ void run_scheduler()
 void signal_handler()
 {
     CRIT_SECTION_BEGIN();
-    preempted = true;
     swapcontext(&current->ctx, &sched_thread->ctx);
     CRIT_SECTION_END();
 }
@@ -218,10 +214,7 @@ void thread_wait(thread_t *thread)
     /* Remove the current thread from running queue */
     current = current->next;
     thread->next = NULL;
-    /* Go back to scheduler */
-    // TODO: better way than a global variable?
-    preempted = true;
-    swapcontext(&thread->ctx, &sched_thread->ctx);
+    swapcontext(&thread->ctx, &current->ctx);
 }
 
 void thread_wakeup(thread_t *thread)
