@@ -3,22 +3,22 @@ project(c_threads C)
 
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Werror")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -pedantic ")
 
 
 # Build a library
 FILE(GLOB mythreadsrc ./src/*)
-#ADD_LIBRARY(mythreadlib STATIC ${mythreadsrc})
-INCLUDE_DIRECTORIES(./src/ ./include/)
+ADD_LIBRARY(mythreadlib STATIC ${mythreadsrc})
+TARGET_INCLUDE_DIRECTORIES(mythreadlib PRIVATE ./src/ ./include/)
 
 
-#INCLUDE_DIRECTORIES(./include/)
+INCLUDE_DIRECTORIES(./include/)
 
-ADD_EXECUTABLE(threads-test main.c ${mythreadsrc})
-#TARGET_LINK_LIBRARIES(threads-test mythreadlib)
+ADD_EXECUTABLE(threads-test main.c)
+TARGET_LINK_LIBRARIES(threads-test mythreadlib)
 
-ADD_EXECUTABLE(cond-test conditional-test.c ${mythreadsrc})
-#TARGET_LINK_LIBRARIES(threads-test mythreadlib)
+ADD_EXECUTABLE(cond-test conditional-test.c)
+TARGET_LINK_LIBRARIES(cond-test mythreadlib)
 
 #add_executable(c_threads main.c include/mythread/mythread.h src/mythread.c src/thread.h src/mutex.c src/mutex.h src/cond.h src/cond.c)
 #
