@@ -14,11 +14,11 @@ TARGET_INCLUDE_DIRECTORIES(mythreadlib PRIVATE ./src/ ./include/)
 
 INCLUDE_DIRECTORIES(./include/)
 
-ADD_EXECUTABLE(mutex-test mutex-test.c)
+ADD_EXECUTABLE(mutex-test examples/mutex-test.c)
 TARGET_LINK_LIBRARIES(mutex-test mythreadlib)
 
-ADD_EXECUTABLE(cond-test conditional-test.c)
+ADD_EXECUTABLE(cond-test examples/conditional-test.c)
 TARGET_LINK_LIBRARIES(cond-test mythreadlib)
 
-ADD_EXECUTABLE(threads-test threads-test.c)
+ADD_EXECUTABLE(threads-test examples/threads-test.c)
 TARGET_LINK_LIBRARIES(threads-test mythreadlib)
