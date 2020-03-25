@@ -24,8 +24,11 @@ There are three example programms included in this project:
 
 ## Limitations
 Because it is just a demo implementation, there are several limitations which should be noted.
-* According to [libc manual](https://www.gnu.org/software/libc/manual/html_node/System-V-contexts.html):
->It is not recommended to do the context switching from the signal handler directly since leaving the signal handler via >etcontext if the signal was delivered during code that was not asynchronous signal safe could lead to problems.
+
+According to [libc manual](https://www.gnu.org/software/libc/manual/html_node/System-V-contexts.html):
+>It is not recommended to do the context switching from the signal handler directly since leaving the signal handler via setcontext if the signal was delivered during code that was not asynchronous signal safe could lead to problems.
 
 However for simplicity, in order to emulate `pthread` API and to minimize user-side code I still do the context switching in a signal handler. The safest way would be to change some variable in a signal handler and call the scheduler in a user's thread, if the variable has been change. This would require additional code on the user side. A different workaround would be to block signals in a thread function when permorming asynchronous unsafe operations.
-* To keep things simple, I only implemented a function `mythread_join`, which causes a main thread to wait for all other threads and starts their execution. There are is no way to specify for which thread to wait.
+
+
+To keep things simple, I only implemented a function `mythread_join`, which causes a main thread to wait for all other threads and starts their execution. There are is no way to specify for which thread to wait.
