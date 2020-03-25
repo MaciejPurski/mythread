@@ -61,7 +61,8 @@ int mythread_lock(mutex_t *mutex);
 /**
  * mythread_unlock() releases the given mutex. It causes all threads
  * suspended on the mutex to be woken up - they return to the ready
- * threads queue.
+ * threads queue. The scheduler will decide, which of the threads
+ * will continue running.
  * @param mutex Pointer to mutex_t struct. Mutex have been initialized
  *              by a call to mythread_mutex(). Mutex does not have to
  *              be previously locked.
@@ -78,7 +79,8 @@ int mythread_cond(cond_t *cond);
 
 /**
  * mythread_wait() causes a running thread to wait on a given
- * conditional variable. It must be called under a locked mutex.
+ * conditional variable. It must be called under a locked mutex owned
+ * by a thread calling mythread_wait().
  * It atomically (under signals blocked) releases a mutex, and causes
  * an running thread to be suspended. Once the other thread, calls
  * mythread_signal() on the same variable, a mutex is acquired once

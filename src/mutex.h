@@ -8,6 +8,7 @@
 
 typedef struct _mutex_internal {
     bool taken;
+    thread_t *thread_owning;
     thread_t *wait_queue;
     unsigned int n_waiting;
 } mutex_internal;

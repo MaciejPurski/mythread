@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "cond.h"
 #include "mutex.h"
+#include "utils.h"
 
 int mythread_cond(cond_t *cond)
 {
@@ -51,15 +52,17 @@ int mythread_wait(cond_t *cond, mutex_t *mutex)
         return -1;
     }
 
-    if (_cond->thread_waiting) {
-        perror("Only one thread can wait on the cond variable!\n");
+    if (_cond->mutex->thread_owning != get_current_thread()) {
+        perror("Mutex must be owned by a calling thread!\n");
         return -1;
     }
 
     CRIT_SECTION_BEGIN();
     _mutex_unlock(mutex);
-    _cond->thread_waiting = get_current_thread();
-    thread_wait(_cond->thread_waiting);
+    thread_t *current = get_current_thread();
+
+    thread_push(&_cond->thread_waiting, current);
+    thread_wait(current);
 
     _mutex_lock(mutex);
     CRIT_SECTION_END();
@@ -81,10 +84,10 @@ int mythread_signal(cond_t *cond)
     CRIT_SECTION_BEGIN();
     cond_internal *_cond = (cond_internal *) cond->private;
 
-    if (_cond->thread_waiting) {
-        thread_wakeup(_cond->thread_waiting);
-        _cond->thread_waiting = NULL;
-    }
+    thread_t *signaled_thread = thread_pop(&_cond->thread_waiting);
+
+    if (signaled_thread)
+        thread_wakeup(signaled_thread);
 
     CRIT_SECTION_END();
 

@@ -1,6 +1,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include "mutex.h"
+#include "utils.h"
 
 
 int mythread_mutex(mutex_t *mutex)
@@ -19,6 +20,7 @@ int mythread_mutex(mutex_t *mutex)
     _mutex->taken = false;
     _mutex->n_waiting = 0;
     _mutex->wait_queue = NULL;
+    _mutex->thread_owning = NULL;
 
     mutex->private = (void *) _mutex;
 
@@ -35,21 +37,15 @@ void _mutex_lock(mutex_t *mutex)
         printf("Block current thread\n");
         _mutex->n_waiting++;
 
-        /* Put the current thread on the end of the
-         * waiting queue */
-        if (!_mutex->wait_queue) {
-            _mutex->wait_queue = current;
-        } else {
-            thread_t *tmp = _mutex->wait_queue;
-            while (tmp->next)
-                tmp = tmp->next;
-
-            tmp->next = current;
-        }
+        /* Push the current thread on the mutex's
+         * wait queue
+         */
+        thread_push(&_mutex->wait_queue, current);
 
         thread_wait(current);
     } else {
         _mutex->taken = true;
+        _mutex->thread_owning = get_current_thread();
     }
 }
 
@@ -76,13 +72,15 @@ void _mutex_unlock(mutex_t *mutex)
 {
     mutex_internal *_mutex = (mutex_internal *) mutex->private;
 
-    _mutex->taken = false;
-
-    if (_mutex->wait_queue) {
-        thread_t *next = _mutex->wait_queue->next;
-        // TODO: better wakeup all the threads waiting on the mutex
-        thread_wakeup(_mutex->wait_queue);
-        _mutex->wait_queue = next;
+    /* Let a first thread from the priority queue acquire
+     * the mutex */
+    thread_t *waiting_thread = thread_pop(&_mutex->wait_queue);
+    if (waiting_thread) {
+        _mutex->thread_owning = waiting_thread;
+        thread_wakeup(waiting_thread);
+    } else {
+        _mutex->taken = false;
+        _mutex->thread_owning = NULL;
     }
 }
 

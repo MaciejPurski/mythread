@@ -17,9 +17,5 @@ INCLUDE_DIRECTORIES(./include/)
 ADD_EXECUTABLE(threads-test main.c)
 TARGET_LINK_LIBRARIES(threads-test mythreadlib)
 
-ADD_EXECUTABLE(cond-test conditional-test.c)
+ADD_EXECUTABLE(cond-test conditional-test.c src/utils.c)
 TARGET_LINK_LIBRARIES(cond-test mythreadlib)
-
-#add_executable(c_threads main.c include/mythread/mythread.h src/mythread.c src/thread.h src/mutex.c src/mutex.h src/cond.h src/cond.c)
-#
-#add_executable(cond-test conditional-test.c include/mythread/mythread.h src/mythread.c src/thread.h src/mutex.c src/mutex.h src/cond.h src/cond.c)
