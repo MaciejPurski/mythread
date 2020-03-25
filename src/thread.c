@@ -69,25 +69,6 @@ void mythread_exit()
 
 static void schedule()
 {
-//    thread_t *old = current;
-//
-//    /* Perform round-robin among threads with same priority.
-//     * Find the last thread with the same priority as current.
-//     */
-//    thread_t *tmp = ready;
-//    while (tmp->next && tmp->next->priority == old->priority) {
-//        tmp = tmp->next;
-//    }
-//
-//    /* Put current thread behind the last element with the same
-//     * priority
-//     */
-//    if (tmp != current) {
-//        current = current->next;
-//        old->next = tmp->next;
-//        tmp->next = old;
-//    }
-
     thread_push(&ready, current);
     current = thread_pop(&ready);
 
@@ -109,9 +90,7 @@ static void run_scheduler()
 
 static void signal_handler()
 {
-    CRIT_SECTION_BEGIN();
     swapcontext(&current->ctx, &sched_thread->ctx);
-    CRIT_SECTION_END();
 }
 
 /* Function used to find a free thread id */
@@ -199,7 +178,16 @@ static int threads_init()
     sigemptyset(&sched_thread->ctx.uc_sigmask);
     sigaddset(&sched_thread->ctx.uc_sigmask, SIGALRM);
 
-    signal(SIGALRM, signal_handler);
+    /* Set signal handler */
+    struct sigaction action;
+    /* Block SIGALRM in signal handler */
+    sigemptyset(&action.sa_mask);
+    sigaddset(&action.sa_mask, SIGALRM);
+
+    action.sa_handler = signal_handler;
+    /* Allow restarting of IO functions */
+    action.sa_flags = SA_RESTART;
+    sigaction(SIGALRM, &action, NULL);
 
     return 0;
 }

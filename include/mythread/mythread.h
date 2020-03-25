@@ -50,8 +50,9 @@ int mythread_mutex(mutex_t *mutex);
 
 /**
  * mythread_lock() tries to take the given mutex. If it is taken,
- * an executing thread is going to be suspended and moved away from
- * the ready threads queue. A context is changed to a next thread.
+ * an executing thread is going to be suspended, moved away from
+ * the ready threads queue and pushed to mutex's priority queue.
+ * A context is changed to a next thread.
  * @param mutex Pointer to mutex_t struct. Mutex have been initialized
  *              by a call to mythread_mutex().
  * @return 0 on success, -1 on failure
@@ -59,10 +60,9 @@ int mythread_mutex(mutex_t *mutex);
 int mythread_lock(mutex_t *mutex);
 
 /**
- * mythread_unlock() releases the given mutex. It causes all threads
- * suspended on the mutex to be woken up - they return to the ready
- * threads queue. The scheduler will decide, which of the threads
- * will continue running.
+ * mythread_unlock() releases the given mutex. If there are any threads
+ * waiting on the mutex, it shall give a mutex to a first thread from
+ * a priority queue and wake it up.
  * @param mutex Pointer to mutex_t struct. Mutex have been initialized
  *              by a call to mythread_mutex(). Mutex does not have to
  *              be previously locked.
@@ -82,7 +82,7 @@ int mythread_cond(cond_t *cond);
  * conditional variable. It must be called under a locked mutex owned
  * by a thread calling mythread_wait().
  * It atomically (under signals blocked) releases a mutex, and causes
- * an running thread to be suspended. Once the other thread, calls
+ * a running thread to be suspended. Once the other thread, calls
  * mythread_signal() on the same variable, a mutex is acquired once
  * again and execution proceeds.
  * @param cond Pointer to conditional variable. Must be initialized.
@@ -93,7 +93,8 @@ int mythread_wait(cond_t *cond, mutex_t *mutex);
 
 /**
  * mythread_signal() wakes up a thread waiting on a given conditional
- * variable.
+ * variable. It wake up a first thread from a conditional variable's
+ * priority queue.
  * @param cond Pointer to conditional variable. It must be initialized.
  * @return 0 on success, -1 on failure
  */
