@@ -41,6 +41,7 @@ int main()
         mythread_start(thread_fun, (void *) &threads[i], threads[i].priority);
 
     mythread_join();
+    mythread_destroy(&mutex);
 
     printf("Threads exited\n");
 

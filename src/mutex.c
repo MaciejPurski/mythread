@@ -34,7 +34,6 @@ void _mutex_lock(mutex_t *mutex)
     if (_mutex->taken) {
         thread_t *current = get_current_thread();
 
-        printf("Block current thread\n");
         _mutex->n_waiting++;
 
         /* Push the current thread on the mutex's

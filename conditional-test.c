@@ -11,7 +11,7 @@ mutex_t count_mutex;
 #define SLEEP() for (int k = 0; k < 400000000; k++) {}
 
 
-void *inc_count(void *t){
+void inc_count(void *t){
     for (int i = 0; i < TCOUNT; i++) {
         mythread_lock(&count_mutex);
         count++;
@@ -26,7 +26,7 @@ void *inc_count(void *t){
     mythread_exit();
 }
 
-void *watch_count(void *t)
+void watch_count(void *t)
 {
     mythread_lock(&count_mutex);
     if (count < COUNT_LIMIT) {
@@ -49,6 +49,10 @@ int main()
 
 
     mythread_join();
+    mythread_destroy(&count_mutex);
+    mythread_destroy(&count_threshold_cv);
 
     printf("Threads exited\n");
+
+    return 0;
 }

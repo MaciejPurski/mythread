@@ -19,7 +19,7 @@ static unsigned int n_threads = 0; /* Threads counter */
 
 static ucontext_t main_ctx; /* Context struct for the main thread */
 
-// TODO: sigaction zamiast sigalarm i ogarnac zachowanie sygnalow przy IO
+
 void mythread_join()
 {
     if (ready) {
@@ -110,8 +110,7 @@ static unsigned int allocate_t_id()
 
     thread_t *tmp_thread = current;
     unsigned int max_id = 1;
-
-    /* Search for a first free id TODO: find lower values */
+    
     while (tmp_thread) {
         if (tmp_thread->t_id > max_id)
             max_id = tmp_thread->t_id;
