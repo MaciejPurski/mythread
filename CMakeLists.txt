@@ -8,7 +8,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -pedantic")
 
 # Build a library
 FILE(GLOB mythreadsrc ./src/*)
-ADD_LIBRARY(mythreadlib STATIC ${mythreadsrc})
+ADD_LIBRARY(mythreadlib SHARED ${mythreadsrc})
 TARGET_INCLUDE_DIRECTORIES(mythreadlib PRIVATE ./src/ ./include/)
 
 

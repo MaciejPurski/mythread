@@ -11,7 +11,8 @@ mutex_t count_mutex;
 #define SLEEP() for (int k = 0; k < 400000000; k++) {}
 
 
-void inc_count(void *t){
+void inc_count(void *arg){
+    char *msg = (char *) arg;
     for (int i = 0; i < TCOUNT; i++) {
         mythread_lock(&count_mutex);
         count++;
@@ -19,7 +20,7 @@ void inc_count(void *t){
             mythread_signal(&count_threshold_cv);
         }
         mythread_unlock(&count_mutex);
-        printf("count: %d \n", count);
+        printf("thread: %s count: %d \n", msg, count);
         SLEEP();
     }
 
@@ -30,6 +31,7 @@ void watch_count(void *t)
 {
     mythread_lock(&count_mutex);
     if (count < COUNT_LIMIT) {
+        printf("Watch thread wait start!\n");
         mythread_wait(&count_threshold_cv,  &count_mutex);
         printf("Watch thread woken up!\n");
         count += 100;
@@ -43,9 +45,9 @@ int main()
     mythread_mutex(&count_mutex);
     mythread_cond(&count_threshold_cv);
 
-    mythread_start(watch_count, NULL, 10);
-    mythread_start(inc_count, NULL, 10);
-    mythread_start(inc_count, NULL, 10);
+    mythread_start(watch_count, NULL, 0);
+    mythread_start(inc_count, "a", 10);
+    mythread_start(inc_count, "b", 10);
 
 
     mythread_join();
