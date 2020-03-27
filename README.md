@@ -31,4 +31,4 @@ According to [libc manual](https://www.gnu.org/software/libc/manual/html_node/Sy
 However for simplicity, in order to emulate `pthread` API and to minimize user-side code I still do the context switching in a signal handler. The safest way would be to change some variable in a signal handler and call the scheduler in a user's thread, if the variable has been change. This would require additional code on the user side. A different workaround would be to block signals in a thread function when permorming asynchronous unsafe operations.
 
 
-To keep things simple, I only implemented a function `mythread_join`, which causes a main thread to wait for all other threads and starts their execution. There are is no way to specify for which thread to wait.
+To keep things simple, I only implemented a function `mythread_join`, which causes a main thread to wait for all other threads and starts their execution. There is no way to specify for which thread to wait.
