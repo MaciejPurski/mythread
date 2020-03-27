@@ -23,7 +23,7 @@ static ucontext_t main_ctx; /* Context struct for the main thread */
 void mythread_join()
 {
     if (ready) {
-        alarm(1);
+        alarm(SCHEDULE_INTERVAL);
         current = thread_pop(&ready);
         swapcontext(&main_ctx, &current->ctx);
     }
@@ -46,10 +46,8 @@ static void thread_destroy()
     thread_t *old = current;
 
     current = thread_pop(&ready);
-
     free(old);
     n_threads--;
-
     /* If there are still threads to be executed,
      * run next thread. Otherwise, go back to the
      * scheduler
@@ -69,9 +67,13 @@ void mythread_exit()
 
 static void schedule()
 {
+    /* Push current thread to ready threads
+     * priority queue */
+    current->state = THREAD_READY;
     thread_push(&ready, current);
-    current = thread_pop(&ready);
 
+    /* Get a new thread to run */
+    current = thread_pop(&ready);
     current->state = THREAD_RUNNING;
     alarm(SCHEDULE_INTERVAL);
     swapcontext(&sched_thread->ctx, &current->ctx);
@@ -125,7 +127,6 @@ static thread_t *thread_struct_init(void (*thread)(void *),
                                     void *args, unsigned int priority)
 {
     thread_t *new_thread = malloc(sizeof(*sched_thread));
-
     if (!new_thread) {
         perror("ERROR: Not enough memory to create a new thread!\n");
         return NULL;
@@ -140,7 +141,6 @@ static thread_t *thread_struct_init(void (*thread)(void *),
         return NULL;
     }
 
-
     /* If a thread finishes without calling mythread_exit(),
      * return to main context for safety.
      */
@@ -148,7 +148,6 @@ static thread_t *thread_struct_init(void (*thread)(void *),
     /* Set stack */
     new_thread->ctx.uc_stack.ss_sp = new_thread->stack;
     new_thread->ctx.uc_stack.ss_size = sizeof(new_thread->stack);
-
     new_thread->state = THREAD_READY;
 
     makecontext(&new_thread->ctx, (void (*)(void))thread, 1, args);
@@ -169,7 +168,6 @@ static int threads_init()
 
     /* Create the scheduler thread */
     sched_thread = thread_struct_init(run_scheduler, NULL, 0);
-
     if (!sched_thread)
         return -1;
 
@@ -209,7 +207,6 @@ int mythread_start(void (*thread)(void *), void *args, unsigned int priority)
         threads_init();
 
     thread_t *new_thread = thread_struct_init(thread, args, priority);
-
     if (!new_thread)
         return -1;
 

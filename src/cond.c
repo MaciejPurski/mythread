@@ -11,7 +11,6 @@ int mythread_cond(cond_t *cond)
     }
 
     cond_internal *_cond = (cond_internal *) malloc(sizeof(cond_internal));
-
     if (!_cond) {
         perror("ERROR: Can't create cond variable, no memory!\n");
         return -1;
@@ -19,7 +18,6 @@ int mythread_cond(cond_t *cond)
 
     _cond->mutex = NULL;
     _cond->thread_waiting = NULL;
-
     cond->private = (void *) _cond;
 
     return 0;
@@ -82,8 +80,8 @@ int mythread_signal(cond_t *cond)
         return -1;
     }
     CRIT_SECTION_BEGIN();
-    cond_internal *_cond = (cond_internal *) cond->private;
 
+    cond_internal *_cond = (cond_internal *) cond->private;
     thread_t *signaled_thread = thread_pop(&_cond->thread_waiting);
 
     if (signaled_thread)

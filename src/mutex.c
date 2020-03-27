@@ -10,8 +10,8 @@ int mythread_mutex(mutex_t *mutex)
         perror("ERROR: mutex is NULL!\n");
         return -1;
     }
-    mutex_internal *_mutex = (mutex_internal *) malloc(sizeof(mutex_internal));
 
+    mutex_internal *_mutex = (mutex_internal *) malloc(sizeof(mutex_internal));
     if (!_mutex) {
         perror("ERROR: Can't create mutex, no memory!\n");
         return -1;
@@ -21,7 +21,6 @@ int mythread_mutex(mutex_t *mutex)
     _mutex->n_waiting = 0;
     _mutex->wait_queue = NULL;
     _mutex->thread_owning = NULL;
-
     mutex->private = (void *) _mutex;
 
     return 0;
@@ -35,12 +34,10 @@ void _mutex_lock(mutex_t *mutex)
         thread_t *current = get_current_thread();
 
         _mutex->n_waiting++;
-
         /* Push the current thread on the mutex's
          * wait queue
          */
         thread_push(&_mutex->wait_queue, current);
-
         thread_wait(current);
     } else {
         _mutex->taken = true;
