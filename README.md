@@ -10,11 +10,9 @@ Threads, mutexes, and conditional variables have been implemented as a C dynamic
 ## Build and run
 This project uses CMake. The commands for building the project and running examples are:
 
-`cmake .
-
+```cmake .
 make
-
-./threads-test`
+./threads-test```
 
 ## Examples
 There are three example programms included in this project:
